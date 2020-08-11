@@ -117,7 +117,7 @@ instructions(void)
 	int i;
 
 	move(2, 35);
-	printw("Sprite 1.1");
+	printw("Sprite 1.2");
 
 	move(4, 50);
 	printw("Key commands");
@@ -194,10 +194,12 @@ change_color(int y, int x, int color)
 	char buf[4];
 	int i, new_color;
 
+	memset(buf, 0, sizeof(buf));
+
 	move(21, 31);
 	printw("Color [0-255]: ");
 	echo();
-	getnstr(buf, sizeof(buf));
+	getnstr(buf, sizeof(buf) - 1);
 	noecho();
 
 	clear();
@@ -221,10 +223,12 @@ file_save(int y, int x)
 	char buf[PATH_MAX];
 	int i, j;
 
+	memset(buf, 0, sizeof(buf));
+
 	move(21, 31);
 	printw("Name: ");
 	echo();
-	getnstr(buf, sizeof(buf));
+	getnstr(buf, sizeof(buf) - 1);
 	noecho();
 
 	if ((fp = fopen(buf, "w+")) == NULL) {
