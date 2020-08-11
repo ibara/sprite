@@ -29,12 +29,12 @@
 /*
  * color -1 == transparent
  */
-typedef struct cell {
+typedef struct pixel {
 	char x;
 	char y;
 	int color;
-} cell_t;
-static cell_t cell[16][16];
+} pixel_t;
+static pixel_t pixel[16][16];
 
 static int
 switch_color(int color)
@@ -73,10 +73,10 @@ draw_screen(int y, int x, int color)
 
 	for (i = 4; i < 20; i++) {
 		for (j = 32; j < 48; j++) {
-			if (cell[i - 4][j - 32].color != -1) {
-				attron(COLOR_PAIR(cell[i - 4][j - 32].color));
+			if (pixel[i - 4][j - 32].color != -1) {
+				attron(COLOR_PAIR(pixel[i - 4][j - 32].color));
 				mvaddch(i, j, ' ');
-				attroff(COLOR_PAIR(cell[i - 4][j - 32].color));
+				attroff(COLOR_PAIR(pixel[i - 4][j - 32].color));
 			}
 		}
 	}
@@ -89,15 +89,15 @@ draw_screen(int y, int x, int color)
 }
 
 static void
-init_cells(void)
+init_pixels(void)
 {
 	int i, j;
 
 	for (i = 0; i < 16; i++) {
 		for (j = 0; j < 16; j++) {
-			cell[i][j].x = j;
-			cell[i][j].y = i;
-			cell[i][j].color = -1;
+			pixel[i][j].x = j;
+			pixel[i][j].y = i;
+			pixel[i][j].color = -1;
 		}
 	}
 }
@@ -239,8 +239,8 @@ file_save(int y, int x)
 
 	for (i = 0; i < 16; i++) {
 		for (j = 0; j < 16; j++) {
-			if (cell[i][j].color != -1)
-				fprintf(fp, "%d,%d,%d\n", cell[i][j].y, cell[i][j].x, cell[i][j].color);
+			if (pixel[i][j].color != -1)
+				fprintf(fp, "%d,%d,%d\n", pixel[i][j].y, pixel[i][j].x, pixel[i][j].color);
 		}
 	}
 	(void) fclose(fp);
@@ -308,9 +308,9 @@ file_open(const char *fn)
 		if (errstr != NULL)
 			return;
 
-		cell[y][x].y = y;
-		cell[y][x].x = x;
-		cell[y][x].color = color;
+		pixel[y][x].y = y;
+		pixel[y][x].x = x;
+		pixel[y][x].color = color;
 	}
 
 out:
@@ -356,7 +356,7 @@ main_loop(void)
 				x = 47;
 			break;
 		case ' ':
-			cell[y - 4][x - 32].color = color;
+			pixel[y - 4][x - 32].color = color;
 			break;
 		case 'C':
 		case 'c':
@@ -364,7 +364,7 @@ main_loop(void)
 			break;
 		case 'D':
 		case 'd':
-			cell[y - 4][x - 32].color = -1;
+			pixel[y - 4][x - 32].color = -1;
 			break;
 		case 'S':
 		case 's':
@@ -399,7 +399,7 @@ main(int argc, char *argv[])
 	color_panel();
 	instructions();
 
-	init_cells();
+	init_pixels();
 
 	draw_transparency();
 
