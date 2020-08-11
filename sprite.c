@@ -117,7 +117,7 @@ instructions(void)
 	int i;
 
 	move(2, 35);
-	printw("Sprite 1.0");
+	printw("Sprite 1.1");
 
 	move(4, 50);
 	printw("Key commands");
@@ -135,6 +135,21 @@ instructions(void)
 	printw("s: save");
 	move(11, 50);
 	printw("q: quit");
+}
+
+static void
+color_panel(void)
+{
+	int i, j, k = 0;
+
+	move(4, 14);
+	for (i = 4; i < 20; i++) {
+		for (j = 14; j < 30; j++) {
+			attron(COLOR_PAIR(k));
+			mvaddch(i, j, ' ');
+			attroff(COLOR_PAIR(k++));
+		}
+	}
 }
 
 static void
@@ -187,6 +202,7 @@ change_color(int y, int x, int color)
 
 	clear();
 	scrinit();
+	color_panel();
 	instructions();
 
 	move(y, x);
@@ -228,6 +244,7 @@ file_save(int y, int x)
 out:
 	clear();
 	scrinit();
+	color_panel();
 	instructions();
 
 	move(y, x);
@@ -375,6 +392,7 @@ main(int argc, char *argv[])
 	curs_set(0);
 
 	scrinit();
+	color_panel();
 	instructions();
 
 	init_cells();
