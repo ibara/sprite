@@ -117,7 +117,7 @@ instructions(void)
 	int i;
 
 	move(2, 35);
-	printw("Sprite 1.2");
+	printw("Sprite 1.3");
 
 	move(4, 50);
 	printw("Key commands");
@@ -320,9 +320,30 @@ out:
 }
 
 static void
+confirm_quit(int y, int x)
+{
+	int c;
+
+again:
+	move(21, 31);
+	printw("Save? [y/n]: ");
+	echo();
+	c = getch();
+	noecho();
+
+	move(21, 31);
+	printw("              ");
+
+	if (c == 'Y' || c == 'y')
+		file_save(y, x);
+	else if (c != 'N' && c != 'n')
+		goto again;
+}
+
+static void
 main_loop(void)
 {
-	int c, color = 0, loop = 1, o, x = 39, y = 11;
+	int c, color = 0, dirty = 0, loop = 1, o, x = 39, y = 11;
 
 	attron(COLOR_PAIR(color));
 	mvaddch(y, x, ' ');
@@ -357,6 +378,7 @@ main_loop(void)
 			break;
 		case ' ':
 			pixel[y - 4][x - 32].color = color;
+			dirty = 1;
 			break;
 		case 'C':
 		case 'c':
@@ -369,9 +391,12 @@ main_loop(void)
 		case 'S':
 		case 's':
 			file_save(y, x);
+			dirty = 0;
 			break;
 		case 'Q':
 		case 'q':
+			if (dirty == 1)
+				confirm_quit(y, x);
 			loop = 0;
 		}
 
