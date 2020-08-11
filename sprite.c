@@ -135,7 +135,7 @@ instructions(void)
 	move(9, 50);
 	printw("d: delete pixel");
 	move(10, 50);
-	printw("e: export");
+	printw("e: export to PNG");
 	move(11, 50);
 	printw("s: save");
 	move(12, 50);
