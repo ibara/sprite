@@ -2,6 +2,7 @@
 
 CC ?=		cc
 CFLAGS ?=	-O2 -pipe
+CFLAGS +=	-I/usr/local/include
 
 PREFIX ?=	/usr/local
 BINDIR ?=	${PREFIX}/bin
@@ -11,7 +12,7 @@ PROG =	sprite
 OBJS =	sprite.o
 
 all: ${OBJS}
-	${CC} ${LDFLAGS} -o ${PROG} ${OBJS} -lcurses
+	${CC} ${LDFLAGS} -o ${PROG} ${OBJS} -lcurses -L/usr/local/lib -lpng
 
 install:
 	install -d -m 755 ${BINDIR}

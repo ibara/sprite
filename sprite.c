@@ -21,10 +21,13 @@
 #include <curses.h>
 #include <err.h>
 #include <limits.h>
+#include <png.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
+
+#include "colors.h"
 
 /*
  * color -1 == transparent
@@ -117,7 +120,7 @@ instructions(void)
 	int i;
 
 	move(2, 35);
-	printw("Sprite 1.3");
+	printw("Sprite 1.4");
 
 	move(4, 50);
 	printw("Key commands");
@@ -132,8 +135,10 @@ instructions(void)
 	move(9, 50);
 	printw("d: delete pixel");
 	move(10, 50);
-	printw("s: save");
+	printw("e: export");
 	move(11, 50);
+	printw("s: save");
+	move(12, 50);
 	printw("q: quit");
 }
 
@@ -217,6 +222,94 @@ change_color(int y, int x, int color)
 }
 
 static void
+file_export(int y, int x)
+{
+	FILE *fp;
+	char buf[PATH_MAX];
+	int code, height = 16, i, j, k = 0, width = 16;
+	png_structp png_ptr = NULL;
+	png_infop info_ptr = NULL;
+	png_byte row[64];
+	png_text title_text;
+
+	memset(buf, 0, sizeof(buf));
+
+	move(21, 31);
+	printw("Name: ");
+	echo();
+	getnstr(buf, sizeof(buf) - 1);
+	noecho();
+
+	if ((fp = fopen(buf, "w+")) == NULL) {
+		move(21, 31);
+		printw("Error: could not open %s for writing");
+		goto out;
+	}
+
+	if ((png_ptr = png_create_write_struct(PNG_LIBPNG_VER_STRING, NULL, NULL, NULL)) == NULL) {
+		move(21, 31);
+		printw("Error: could not allocate png write struct");
+		(void) fclose(fp);
+		goto out;
+	}
+
+	if ((info_ptr = png_create_info_struct(png_ptr)) == NULL) {
+		move(21, 31);
+		printw("Error: could not allocate png info struct");
+		(void) fclose(fp);
+		goto out;
+	}
+
+	if (setjmp(png_jmpbuf(png_ptr))) {
+		move(21, 31);
+		printw("Error: could not create png");
+		(void) fclose(fp);
+		goto out;
+	}
+
+	png_init_io(png_ptr, fp);
+
+	png_set_IHDR(png_ptr, info_ptr, width, height, 8, PNG_COLOR_TYPE_RGB_ALPHA, PNG_INTERLACE_NONE, PNG_COMPRESSION_TYPE_BASE, PNG_FILTER_TYPE_BASE);
+
+	title_text.compression = PNG_TEXT_COMPRESSION_NONE;
+	title_text.key = "Title";
+	title_text.text = buf;
+	png_set_text(png_ptr, info_ptr, &title_text, 1);
+
+	png_write_info(png_ptr, info_ptr);
+
+	for (i = 0; i < height; i++) {
+		k = 0;
+		for (j = 0; j < width; j++) {
+			row[k++] = (colors[pixel[i][j].color] >> 16) & 0xff;
+			row[k++] = (colors[pixel[i][j].color] >> 8) & 0xff;
+			row[k++] = colors[pixel[i][j].color] & 0xff;
+			if (pixel[i][j].color == -1)
+				row[k++] = 0;
+			else
+				row[k++] = 0xff;
+		}
+		png_write_row(png_ptr, row);
+	}
+	png_write_end(png_ptr, NULL);
+
+	(void) fclose(fp);
+
+out:
+	if (info_ptr != NULL)
+		png_free_data(png_ptr, info_ptr, PNG_FREE_ALL, -1);
+	if (png_ptr != NULL)
+		png_destroy_write_struct(&png_ptr, NULL);
+
+	clear();
+	scrinit();
+	color_panel();
+	instructions();
+
+	move(y, x);
+}
+
+static void
 file_save(int y, int x)
 {
 	FILE *fp;
@@ -233,7 +326,7 @@ file_save(int y, int x)
 
 	if ((fp = fopen(buf, "w+")) == NULL) {
 		move(21, 31);
-		printw("Error: could not open %s for writing", buf);
+		printw("Error: could not open %s for writing");
 		goto out;
 	}
 
@@ -387,6 +480,10 @@ main_loop(void)
 		case 'D':
 		case 'd':
 			pixel[y - 4][x - 32].color = -1;
+			break;
+		case 'E':
+		case 'e':
+			file_export(y, x);
 			break;
 		case 'S':
 		case 's':
