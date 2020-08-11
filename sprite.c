@@ -20,6 +20,7 @@
 
 #include <curses.h>
 #include <err.h>
+#include <limits.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -184,9 +185,9 @@ change_color(int y, int x, int color)
 	getnstr(buf, sizeof(buf));
 	noecho();
 
-	move(21, 31);
-	for (i = 0; i < 80; i++)
-		addch(' ');
+	clear();
+	scrinit();
+	instructions();
 
 	move(y, x);
 
@@ -201,7 +202,7 @@ static void
 file_save(int y, int x)
 {
 	FILE *fp;
-	char buf[64];
+	char buf[PATH_MAX];
 	int i, j;
 
 	move(21, 31);
@@ -225,9 +226,9 @@ file_save(int y, int x)
 	(void) fclose(fp);
 
 out:
-	move(21, 31);
-	for (i = 0; i < 80; i++)
-		addch(' ');
+	clear();
+	scrinit();
+	instructions();
 
 	move(y, x);
 }
