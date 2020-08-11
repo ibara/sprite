@@ -242,7 +242,7 @@ file_export(int y, int x)
 
 	if ((fp = fopen(buf, "w+")) == NULL) {
 		move(21, 31);
-		printw("Error: could not open %s for writing");
+		printw("Error: could not open %s for writing", buf);
 		goto out;
 	}
 
@@ -326,7 +326,7 @@ file_save(int y, int x)
 
 	if ((fp = fopen(buf, "w+")) == NULL) {
 		move(21, 31);
-		printw("Error: could not open %s for writing");
+		printw("Error: could not open %s for writing", buf);
 		goto out;
 	}
 
