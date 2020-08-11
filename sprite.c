@@ -15,7 +15,7 @@
  */
 
 /*
- * sprite -- console sprite maker
+ * sprite -- console sprite editor
  */
 
 #include <curses.h>
