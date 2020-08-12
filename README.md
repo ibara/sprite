@@ -23,3 +23,8 @@ License
 -------
 ISC License.
 See `LICENSE` for details.
+
+Todo
+----
+* Fill command (f)
+* Line drawing (hold Shift + move new location)
