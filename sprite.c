@@ -28,6 +28,7 @@
 #include <unistd.h>
 
 #include "colors.h"
+#include "sprite.h"
 
 static char extended;
 
