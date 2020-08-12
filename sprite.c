@@ -122,7 +122,7 @@ instructions(void)
 	int i;
 
 	move(2, 35 + (extended ? 8 : 0));
-	printw("Sprite 1.5");
+	printw("Sprite 1.6");
 
 	move(4, 50 + (extended ? 16 : 0));
 	printw("Key commands");
@@ -133,14 +133,16 @@ instructions(void)
 	move(7, 50 + (extended ? 16 : 0));
 	printw("Spacebar: draw pixel");
 	move(8, 50 + (extended ? 16 : 0));
-	printw("c: change color");
+	printw("/: toggle spacebar lock");
 	move(9, 50 + (extended ? 16 : 0));
-	printw("d: delete pixel");
+	printw("c: change color");
 	move(10, 50 + (extended ? 16 : 0));
-	printw("e: export to PNG");
+	printw("d: delete pixel");
 	move(11, 50 + (extended ? 16 : 0));
-	printw("s: save");
+	printw("e: export to PNG");
 	move(12, 50 + (extended ? 16 : 0));
+	printw("s: save");
+	move(13, 50 + (extended ? 16 : 0));
 	printw("q: quit");
 }
 
@@ -203,7 +205,7 @@ change_color(int y, int x, int color)
 
 	memset(buf, 0, sizeof(buf));
 
-	move(21, 31);
+	move(21 + (extended ? 16 : 0), 31);
 	printw("Color [0-255]: ");
 	echo();
 	getnstr(buf, sizeof(buf) - 1);
@@ -461,7 +463,7 @@ again:
 static void
 main_loop(void)
 {
-	int c, color = 0, dirty = 0, loop = 1, o, x, y;
+	int c, color = 0, dirty = 0, lock = 0, loop = 1, o, x, y;
 
 	x = (extended ? 47 : 39);
 	y = (extended ? 19 : 11);
@@ -473,31 +475,44 @@ main_loop(void)
 
 	while (loop) {
 		switch ((c = getch())) {
+		case '/':
+			if ((lock = !lock))
+				goto print;
+			break;
 		case KEY_UP:
 		case 'K':
 		case 'k':
 			if (--y < 4)
 				y = 4;
+			if (lock)
+				goto print;
 			break;
 		case KEY_DOWN:
 		case 'J':
 		case 'j':
 			if (++y > (extended ? 35: 19))
 				y = (extended ? 35: 19);
+			if (lock)
+				goto print;
 			break;
 		case KEY_LEFT:
 		case 'H':
 		case 'h':
 			if (--x < 32)
 				x = 32;
+			if (lock)
+				goto print;
 			break;
 		case KEY_RIGHT:
 		case 'L':
 		case 'l':
 			if (++x > (extended ? 63 : 47))
 				x = (extended ? 63 : 47);
+			if (lock)
+				goto print;
 			break;
 		case ' ':
+print:
 			pixel[y - 4][x - 32].color = color;
 			dirty = 1;
 			break;
