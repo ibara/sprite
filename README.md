@@ -28,4 +28,4 @@ See `LICENSE` for details.
 
 Todo
 ----
-* Fill command (f)
+* Undo command (u)

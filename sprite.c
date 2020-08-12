@@ -140,10 +140,12 @@ instructions(void)
 	move(10, 50 + (extended ? 16 : 0));
 	printw("d: delete pixel");
 	move(11, 50 + (extended ? 16 : 0));
-	printw("e: export to PNG");
-	move(12, 50 + (extended ? 16 : 0));
-	printw("s: save");
+	printw("f: fill region");
 	move(13, 50 + (extended ? 16 : 0));
+	printw("e: export to PNG");
+	move(14, 50 + (extended ? 16 : 0));
+	printw("s: save");
+	move(15, 50 + (extended ? 16 : 0));
 	printw("q: quit");
 }
 
@@ -224,6 +226,28 @@ change_color(int y, int x, int color)
 		return color;
 
 	return new_color;
+}
+
+static void
+fill_region(int y, int x, int color, int target)
+{
+
+	if (y < 4 || y > (extended ? 36 : 20))
+		return;
+	if (x < 32 || x > (extended ? 64 : 48))
+		return;
+
+	if (color == target)
+		return;
+	else if (pixel[y - 4][x - 32].color != target)
+		return;
+	else
+		pixel[y - 4][x - 32].color = color;
+
+	fill_region(y + 1, x, color, target);
+	fill_region(y - 1, x, color, target);
+	fill_region(y, x - 1, color, target);
+	fill_region(y, x + 1, color, target);
 }
 
 static void
@@ -530,6 +554,10 @@ print:
 		case 'E':
 		case 'e':
 			file_export(y, x);
+			break;
+		case 'F':
+		case 'f':
+			fill_region(y, x, color, pixel[y - 4][x - 32].color);
 			break;
 		case 'S':
 		case 's':
