@@ -29,6 +29,8 @@
 
 #include "colors.h"
 
+static char extended;
+
 /*
  * color -1 == transparent
  */
@@ -37,7 +39,7 @@ typedef struct pixel {
 	char y;
 	int color;
 } pixel_t;
-static pixel_t pixel[16][16];
+static pixel_t pixel[32][32];
 
 static int
 switch_color(int color)
@@ -54,11 +56,11 @@ draw_transparency(void)
 {
 	int i, j, k = 7;
 
-	for (i = 4; i < 20; i++) {
-		if (i % 4 == 0)
+	for (i = 4; i < 20 + (extended ? 16 : 0); i++) {
+		if ((i - 4) % (extended ? 8 : 4) == 0)
 			k = switch_color(k);
-		for (j = 32; j < 48; j++) {
-			if (j % 4 == 0)
+		for (j = 32; j < 48 + (extended ? 16 : 0); j++) {
+			if (j % (extended ? 8: 4) == 0)
 				k = switch_color(k);
 			attron(COLOR_PAIR(k));
 			mvaddch(i, j, ' ');
@@ -74,8 +76,8 @@ draw_screen(int y, int x, int color)
 
 	draw_transparency();
 
-	for (i = 4; i < 20; i++) {
-		for (j = 32; j < 48; j++) {
+	for (i = 4; i < 20 + (extended ? 16 : 0); i++) {
+		for (j = 32; j < 48 + (extended ? 16 : 0); j++) {
 			if (pixel[i - 4][j - 32].color != -1) {
 				attron(COLOR_PAIR(pixel[i - 4][j - 32].color));
 				mvaddch(i, j, ' ');
@@ -96,8 +98,8 @@ init_pixels(void)
 {
 	int i, j;
 
-	for (i = 0; i < 16; i++) {
-		for (j = 0; j < 16; j++) {
+	for (i = 0; i < 16 + (extended ? 16 : 0); i++) {
+		for (j = 0; j < 16 + (extended ? 16 : 0); j++) {
 			pixel[i][j].x = j;
 			pixel[i][j].y = i;
 			pixel[i][j].color = -1;
@@ -119,26 +121,26 @@ instructions(void)
 {
 	int i;
 
-	move(2, 35);
-	printw("Sprite 1.4");
+	move(2, 35 + (extended ? 8 : 0));
+	printw("Sprite 1.5");
 
-	move(4, 50);
+	move(4, 50 + (extended ? 16 : 0));
 	printw("Key commands");
-	move(5, 50);
+	move(5, 50 + (extended ? 16 : 0));
 	printw("============");
-	move(6, 50);
+	move(6, 50 + (extended ? 16 : 0));
 	printw("Arrow keys: move");
-	move(7, 50);
+	move(7, 50 + (extended ? 16 : 0));
 	printw("Spacebar: draw pixel");
-	move(8, 50);
+	move(8, 50 + (extended ? 16 : 0));
 	printw("c: change color");
-	move(9, 50);
+	move(9, 50 + (extended ? 16 : 0));
 	printw("d: delete pixel");
-	move(10, 50);
+	move(10, 50 + (extended ? 16 : 0));
 	printw("e: export to PNG");
-	move(11, 50);
+	move(11, 50 + (extended ? 16 : 0));
 	printw("s: save");
-	move(12, 50);
+	move(12, 50 + (extended ? 16 : 0));
 	printw("q: quit");
 }
 
@@ -173,21 +175,21 @@ scrinit(void)
 	move(3, 31);
 
 	addch(ACS_ULCORNER);
-	for (i = 0; i < 16; i++)
+	for (i = 0; i < 16 + (extended ? 16 : 0); i++)
 		addch(ACS_HLINE);
 	addch(ACS_URCORNER);
 
-	for (i = 4; i < 20; i++) {
+	for (i = 4; i < 20 + (extended ? 16 : 0); i++) {
 		move(i, 31);
 		addch(ACS_VLINE);
-		move(i, 48);
+		move(i, 48 + (extended ? 16 : 0));
 		addch(ACS_VLINE);
 	}
 
 	move(i, 31);
 
 	addch(ACS_LLCORNER);
-	for (i = 0; i < 16; i++)
+	for (i = 0; i < 16 + (extended ? 16 : 0); i++)
 		addch(ACS_HLINE);
 	addch(ACS_LRCORNER);
 }
@@ -226,42 +228,45 @@ file_export(int y, int x)
 {
 	FILE *fp;
 	char buf[PATH_MAX];
-	int code, height = 16, i, j, k = 0, width = 16;
+	int code, height, i, j, k = 0, width;
 	png_structp png_ptr = NULL;
 	png_infop info_ptr = NULL;
-	png_byte row[64];
+	png_byte row[64], extended_row[128];
 	png_text title_text;
+
+	height = (extended ? 32 : 16);
+	width = (extended ? 32 : 16);
 
 	memset(buf, 0, sizeof(buf));
 
-	move(21, 31);
+	move(21 + (extended ? 16 : 0), 31);
 	printw("Name: ");
 	echo();
 	getnstr(buf, sizeof(buf) - 1);
 	noecho();
 
 	if ((fp = fopen(buf, "w+")) == NULL) {
-		move(21, 31);
+		move(21 + (extended ? 16 : 0), 31);
 		printw("Error: could not open %s for writing", buf);
 		goto out;
 	}
 
 	if ((png_ptr = png_create_write_struct(PNG_LIBPNG_VER_STRING, NULL, NULL, NULL)) == NULL) {
-		move(21, 31);
+		move(21 + (extended ? 16 : 0), 31);
 		printw("Error: could not allocate png write struct");
 		(void) fclose(fp);
 		goto out;
 	}
 
 	if ((info_ptr = png_create_info_struct(png_ptr)) == NULL) {
-		move(21, 31);
+		move(21 + (extended ? 16 : 0), 31);
 		printw("Error: could not allocate png info struct");
 		(void) fclose(fp);
 		goto out;
 	}
 
 	if (setjmp(png_jmpbuf(png_ptr))) {
-		move(21, 31);
+		move(21 + (extended ? 16 : 0), 31);
 		printw("Error: could not create png");
 		(void) fclose(fp);
 		goto out;
@@ -281,15 +286,29 @@ file_export(int y, int x)
 	for (i = 0; i < height; i++) {
 		k = 0;
 		for (j = 0; j < width; j++) {
-			row[k++] = (colors[pixel[i][j].color] >> 16) & 0xff;
-			row[k++] = (colors[pixel[i][j].color] >> 8) & 0xff;
-			row[k++] = colors[pixel[i][j].color] & 0xff;
-			if (pixel[i][j].color == -1)
-				row[k++] = 0;
-			else
-				row[k++] = 0xff;
+			if (extended) {
+				extended_row[k++] = (colors[pixel[i][j].color] >> 16) & 0xff;
+				extended_row[k++] = (colors[pixel[i][j].color] >> 8) & 0xff;
+				extended_row[k++] = colors[pixel[i][j].color] & 0xff;
+				if (pixel[i][j].color == -1)
+					extended_row[k++] = 0;
+				else
+					extended_row[k++] = 0xff;
+			} else {
+				row[k++] = (colors[pixel[i][j].color] >> 16) & 0xff;
+				row[k++] = (colors[pixel[i][j].color] >> 8) & 0xff;
+				row[k++] = colors[pixel[i][j].color] & 0xff;
+				if (pixel[i][j].color == -1)
+					row[k++] = 0;
+				else
+					row[k++] = 0xff;
+			}
 		}
-		png_write_row(png_ptr, row);
+		if (extended) {
+			png_write_row(png_ptr, extended_row);
+		} else {
+			png_write_row(png_ptr, row);
+		}
 	}
 	png_write_end(png_ptr, NULL);
 
@@ -318,7 +337,7 @@ file_save(int y, int x)
 
 	memset(buf, 0, sizeof(buf));
 
-	move(21, 31);
+	move(21 + (extended ? 16 : 0), 31);
 	printw("Name: ");
 	echo();
 	getnstr(buf, sizeof(buf) - 1);
@@ -330,8 +349,8 @@ file_save(int y, int x)
 		goto out;
 	}
 
-	for (i = 0; i < 16; i++) {
-		for (j = 0; j < 16; j++) {
+	for (i = 0; i < 16 + (extended ? 16 : 0); i++) {
+		for (j = 0; j < 16 + (extended ? 16 : 0); j++) {
 			if (pixel[i][j].color != -1)
 				fprintf(fp, "%d,%d,%d\n", pixel[i][j].y, pixel[i][j].x, pixel[i][j].color);
 		}
@@ -389,11 +408,17 @@ file_open(const char *fn)
 		}
 		colorbuf[i] = '\0';
 
-		y = strtonum(ybuf, 0, 15, &errstr);
+		if (extended)
+			y = strtonum(ybuf, 0, 31, &errstr);
+		else
+			y = strtonum(ybuf, 0, 15, &errstr);
 		if (errstr != NULL)
 			return;
 
-		x = strtonum(xbuf, 0, 15, &errstr);
+		if (extended)
+			x = strtonum(xbuf, 0, 31, &errstr);
+		else
+			x = strtonum(xbuf, 0, 15, &errstr);
 		if (errstr != NULL)
 			return;
 
@@ -418,13 +443,13 @@ confirm_quit(int y, int x)
 	int c;
 
 again:
-	move(21, 31);
+	move(21 + (extended ? 16 : 0), 31);
 	printw("Save? [y/n]: ");
 	echo();
 	c = getch();
 	noecho();
 
-	move(21, 31);
+	move(21 + (extended ? 16 : 0), 31);
 	printw("              ");
 
 	if (c == 'Y' || c == 'y')
@@ -436,7 +461,10 @@ again:
 static void
 main_loop(void)
 {
-	int c, color = 0, dirty = 0, loop = 1, o, x = 39, y = 11;
+	int c, color = 0, dirty = 0, loop = 1, o, x, y;
+
+	x = (extended ? 47 : 39);
+	y = (extended ? 19 : 11);
 
 	attron(COLOR_PAIR(color));
 	mvaddch(y, x, ' ');
@@ -454,8 +482,8 @@ main_loop(void)
 		case KEY_DOWN:
 		case 'J':
 		case 'j':
-			if (++y > 19)
-				y = 19;
+			if (++y > (extended ? 35: 19))
+				y = (extended ? 35: 19);
 			break;
 		case KEY_LEFT:
 		case 'H':
@@ -466,8 +494,8 @@ main_loop(void)
 		case KEY_RIGHT:
 		case 'L':
 		case 'l':
-			if (++x > 47)
-				x = 47;
+			if (++x > (extended ? 63 : 47))
+				x = (extended ? 63 : 47);
 			break;
 		case ' ':
 			pixel[y - 4][x - 32].color = color;
@@ -501,14 +529,34 @@ main_loop(void)
 	}
 }
 
+static void
+usage(void)
+{
+
+	fprintf(stderr, "usage: %s [-e] [file]\n", getprogname());
+
+	exit(1);
+}
+
 int
 main(int argc, char *argv[])
 {
+	int ch;
 
-	if (argc > 2) {
-		fprintf(stderr, "usage: %s [file]\n", getprogname());
-		exit(1);
+	while ((ch = getopt(argc, argv, "e")) != -1) {
+		switch (ch) {
+		case 'e':
+			extended = 1;
+			break;
+		default:
+			usage();
+		}
 	}
+	argc -= optind;
+	argv += optind;
+
+	if (argc > 1)
+		usage();
 
 	initscr();
 	clear();
@@ -525,8 +573,8 @@ main(int argc, char *argv[])
 
 	draw_transparency();
 
-	if (argc == 2)
-		file_open(argv[1]);
+	if (argc == 1)
+		file_open(*argv);
 
 	main_loop();
 
