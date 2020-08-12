@@ -41,8 +41,6 @@ typedef struct pixel {
 	int color;
 } pixel_t;
 static pixel_t pixel[32][32];
-
-static pixel_t temp[32][32];
 static pixel_t undo[32][32];
 
 static int
@@ -236,6 +234,7 @@ change_color(int y, int x, int color)
 static void
 do_undo(void)
 {
+	pixel_t temp[32][32];
 	int i, j;
 
 	for (i = 0; i < 16 + (extended ? 16 : 0); i++) {
