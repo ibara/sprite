@@ -124,7 +124,7 @@ instructions(void)
 	int i;
 
 	move(2, 35 + (extended ? 8 : 0));
-	printw("Sprite 1.6");
+	printw("Sprite 1.7");
 
 	move(4, 50 + (extended ? 16 : 0));
 	printw("Key commands");
@@ -537,8 +537,10 @@ main_loop(void)
 	while (loop) {
 		switch ((c = getch())) {
 		case '/':
-			if ((lock = !lock))
+			if ((lock = !lock)) {
+				update_undo();
 				goto print;
+			}
 			break;
 		case KEY_UP:
 		case 'K':
@@ -573,8 +575,8 @@ main_loop(void)
 				goto print;
 			break;
 		case ' ':
-print:
 			update_undo();
+print:
 			pixel[y - 4][x - 32].color = color;
 			dirty = 1;
 			break;
