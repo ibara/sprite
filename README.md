@@ -25,7 +25,3 @@ License
 -------
 ISC License.
 See `LICENSE` for details.
-
-Todo
-----
-* Undo command (u)

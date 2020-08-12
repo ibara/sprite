@@ -42,6 +42,9 @@ typedef struct pixel {
 } pixel_t;
 static pixel_t pixel[32][32];
 
+static pixel_t temp[32][32];
+static pixel_t undo[32][32];
+
 static int
 switch_color(int color)
 {
@@ -141,11 +144,13 @@ instructions(void)
 	printw("d: delete pixel");
 	move(11, 50 + (extended ? 16 : 0));
 	printw("f: fill region");
-	move(13, 50 + (extended ? 16 : 0));
-	printw("e: export to PNG");
+	move(12, 50 + (extended ? 16 : 0));
+	printw("u: undo");
 	move(14, 50 + (extended ? 16 : 0));
-	printw("s: save");
+	printw("e: export to PNG");
 	move(15, 50 + (extended ? 16 : 0));
+	printw("s: save");
+	move(16, 50 + (extended ? 16 : 0));
 	printw("q: quit");
 }
 
@@ -226,6 +231,38 @@ change_color(int y, int x, int color)
 		return color;
 
 	return new_color;
+}
+
+static void
+do_undo(void)
+{
+	int i, j;
+
+	for (i = 0; i < 16 + (extended ? 16 : 0); i++) {
+		for (j = 0; j < 16 + (extended ? 16 : 0); j++)
+			temp[i][j].color = pixel[i][j].color;
+	}
+
+	for (i = 0; i < 16 + (extended ? 16 : 0); i++) {
+		for (j = 0; j < 16 + (extended ? 16 : 0); j++)
+			pixel[i][j].color = undo[i][j].color;
+	}
+
+	for (i = 0; i < 16 + (extended ? 16 : 0); i++) {
+		for (j = 0; j < 16 + (extended ? 16 : 0); j++)
+			undo[i][j].color = temp[i][j].color;
+	}
+}
+
+static void
+update_undo(void)
+{
+	int i, j;
+
+	for (i = 0; i < 16 + (extended ? 16 : 0); i++) {
+		for (j = 0; j < 16 + (extended ? 16 : 0); j++)
+			undo[i][j].color = pixel[i][j].color;
+	}
 }
 
 static void
@@ -538,6 +575,7 @@ main_loop(void)
 			break;
 		case ' ':
 print:
+			update_undo();
 			pixel[y - 4][x - 32].color = color;
 			dirty = 1;
 			break;
@@ -549,6 +587,7 @@ print:
 			break;
 		case 'D':
 		case 'd':
+			update_undo();
 			pixel[y - 4][x - 32].color = -1;
 			break;
 		case 'E':
@@ -557,6 +596,7 @@ print:
 			break;
 		case 'F':
 		case 'f':
+			update_undo();
 			fill_region(y, x, color, pixel[y - 4][x - 32].color);
 			break;
 		case 'S':
@@ -569,6 +609,10 @@ print:
 			if (dirty == 1)
 				confirm_quit(y, x);
 			loop = 0;
+			break;
+		case 'U':
+		case 'u':
+			do_undo();
 		}
 
 		draw_screen(y, x, color);
