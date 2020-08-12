@@ -19,6 +19,8 @@ Building
 --------
 Just run `make`.
 
+Remove `-DHAVE_STRTONUM` if your system needs the strtonum(3) function.
+
 License
 -------
 ISC License.
