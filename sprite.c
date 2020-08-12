@@ -520,6 +520,8 @@ print:
 		case 'C':
 		case 'c':
 			color = change_color(y, x, color);
+			if (lock)
+				goto print;
 			break;
 		case 'D':
 		case 'd':
