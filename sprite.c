@@ -41,7 +41,6 @@ typedef struct pixel {
 	int color;
 } pixel_t;
 static pixel_t pixel[32][32];
-static pixel_t undo[32][32];
 
 static int
 switch_color(int color)
@@ -232,21 +231,21 @@ change_color(int y, int x, int color)
 }
 
 static void
-do_undo(void)
+do_undo(int go)
 {
-	pixel_t temp[32][32];
+	static pixel_t temp[32][32], undo[32][32];
 
-	memset(&temp, 0, sizeof(temp));
+	if (go) {
+		memset(&temp, 0, sizeof(temp));
 
-	memmove(&temp, &pixel, sizeof(temp));
-	memmove(&pixel, &undo, sizeof(pixel));
-	memmove(&undo, &temp, sizeof(temp));
-}
+		memmove(&temp, &pixel, sizeof(temp));
+		memmove(&pixel, &undo, sizeof(pixel));
+		memmove(&undo, &temp, sizeof(undo));
 
-static void
-update_undo(void)
-{
+		return;
+	}
 
+	/* Otherwise, update the buffer */
 	memmove(&undo, &pixel, sizeof(undo));
 }
 
@@ -524,7 +523,7 @@ main_loop(void)
 		switch ((c = getch())) {
 		case '/':
 			if ((lock = !lock)) {
-				update_undo();
+				do_undo(0);
 				goto print;
 			}
 			break;
@@ -561,7 +560,7 @@ main_loop(void)
 				goto print;
 			break;
 		case ' ':
-			update_undo();
+			do_undo(0);
 print:
 			pixel[y - 4][x - 32].color = color;
 			dirty = 1;
@@ -574,7 +573,7 @@ print:
 			break;
 		case 'D':
 		case 'd':
-			update_undo();
+			do_undo(0);
 			pixel[y - 4][x - 32].color = -1;
 			dirty = 1;
 			break;
@@ -584,7 +583,7 @@ print:
 			break;
 		case 'F':
 		case 'f':
-			update_undo();
+			do_undo(0);
 			fill_region(y, x, color, pixel[y - 4][x - 32].color);
 			dirty = 1;
 			break;
@@ -601,7 +600,7 @@ print:
 			break;
 		case 'U':
 		case 'u':
-			do_undo();
+			do_undo(1);
 		}
 
 		draw_screen(y, x, color);
@@ -651,6 +650,9 @@ main(int argc, char *argv[])
 	init_pixels();
 
 	draw_transparency();
+
+	/* Set up undo structures */
+	do_undo(0);
 
 	if (argc == 1)
 		file_open(*argv);
