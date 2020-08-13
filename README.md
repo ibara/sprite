@@ -6,7 +6,8 @@ You can use it to create and share pixel art.
 By default, sprite sets up a 16x16 pixel canvas.
 If you'd like the larger 32x32 pixel canvas,
 start sprite with the -e flag.
-It is the responsibility of the user to ensure the terminal is properly sized.
+If your terminal is not large enough to fit the 32x32 canvas,
+it will use the 16x16 canvas instead.
 
 Requirements
 ------------

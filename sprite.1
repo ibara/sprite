@@ -33,15 +33,13 @@ You can use it to create and share pixel art.
 The options are as follows:
 .Bl -tag -width Ds
 .It Fl e
-Use an extended canvas of 32x32 pixels instead of the default 16x16 pixels.
+Use an extended canvas of 32x32 pixels instead of the default 16x16 pixels,
+if the terminal is large enough to support the larger canvas.
 .El
 .Sh AUTHORS
 .Nm
 was written by
 .An Brian Callahan Aq Mt bcallah@openbsd.org .
 .Sh CAVEATS
-It is the responsibility of the user to ensure the terminal is properly
-sized.
-.Pp
 Console aspect ratio may not match user expectations.
 PNG export creates standard square pixels.

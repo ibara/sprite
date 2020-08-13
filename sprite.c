@@ -169,7 +169,7 @@ color_panel(void)
 static void
 scrinit(void)
 {
-	int i;
+	int i, x, y;
 
 	if (has_colors() == FALSE) {
 		endwin();
@@ -178,6 +178,14 @@ scrinit(void)
 
 	start_color();
 	init_colors();
+
+	getmaxyx(stdscr, y, x);
+	if (y < 39 || x < 90)
+		extended = 0;
+	if (y < 23 || x < 74) {
+		endwin();
+		errx(1, "terminal too small!");
+	}
 
 	move(3, 31);
 
@@ -392,7 +400,7 @@ file_save(int y, int x)
 	noecho();
 
 	if ((fp = fopen(buf, "w+")) == NULL) {
-		move(21, 31);
+		move(21 + (extended ? 16 : 0), 31);
 		printw("Error: could not open %s for writing", buf);
 		goto out;
 	}
