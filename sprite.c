@@ -590,6 +590,7 @@ print:
 		case 'd':
 			update_undo();
 			pixel[y - 4][x - 32].color = -1;
+			dirty = 1;
 			break;
 		case 'E':
 		case 'e':
@@ -599,6 +600,7 @@ print:
 		case 'f':
 			update_undo();
 			fill_region(y, x, color, pixel[y - 4][x - 32].color);
+			dirty = 1;
 			break;
 		case 'S':
 		case 's':
