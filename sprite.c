@@ -235,33 +235,19 @@ static void
 do_undo(void)
 {
 	pixel_t temp[32][32];
-	int i, j;
 
-	for (i = 0; i < 16 + (extended ? 16 : 0); i++) {
-		for (j = 0; j < 16 + (extended ? 16 : 0); j++)
-			temp[i][j].color = pixel[i][j].color;
-	}
+	memset(&temp, 0, sizeof(temp));
 
-	for (i = 0; i < 16 + (extended ? 16 : 0); i++) {
-		for (j = 0; j < 16 + (extended ? 16 : 0); j++)
-			pixel[i][j].color = undo[i][j].color;
-	}
-
-	for (i = 0; i < 16 + (extended ? 16 : 0); i++) {
-		for (j = 0; j < 16 + (extended ? 16 : 0); j++)
-			undo[i][j].color = temp[i][j].color;
-	}
+	memmove(&temp, &pixel, sizeof(temp));
+	memmove(&pixel, &undo, sizeof(pixel));
+	memmove(&undo, &temp, sizeof(temp));
 }
 
 static void
 update_undo(void)
 {
-	int i, j;
 
-	for (i = 0; i < 16 + (extended ? 16 : 0); i++) {
-		for (j = 0; j < 16 + (extended ? 16 : 0); j++)
-			undo[i][j].color = pixel[i][j].color;
-	}
+	memmove(&undo, &pixel, sizeof(undo));
 }
 
 static void
