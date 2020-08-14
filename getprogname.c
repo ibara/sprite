@@ -15,9 +15,12 @@
  */
 
 #ifndef HAVE_GETPROGNAME
-extern const char *getprogname(void);
-#endif
 
-#ifndef HAVE_STRTONUM
-extern long long strtonum(const char *, long long, long long, const char **);
-#endif
+const char *
+getprogname(void)
+{
+
+	return "sprite";
+}
+
+#endif /* !HAVE_GETPROGNAME */

@@ -123,7 +123,7 @@ instructions(void)
 	int i;
 
 	move(2, 35 + (extended ? 8 : 0));
-	printw("Sprite 1.7");
+	printw("Sprite 1.8");
 
 	move(4, 50 + (extended ? 16 : 0));
 	printw("Key commands");

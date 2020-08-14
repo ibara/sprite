@@ -4,10 +4,27 @@ Sprite is an ncurses-based sprite editor.
 You can use it to create and share pixel art.
 
 By default, sprite sets up a 16x16 pixel canvas.
-If you'd like the larger 32x32 pixel canvas,
-start sprite with the -e flag.
-If your terminal is not large enough to fit the 32x32 canvas,
-it will use the 16x16 canvas instead.
+If you'd like the larger 32x32 pixel canvas, start sprite with the -e
+flag.
+If your terminal is not large enough to fit the 32x32 canvas, it will
+use the 16x16 canvas instead.
+
+Save file format
+----------------
+Images are saved as a flat text file, one pixel per line, in the form
+```
+y,x,color
+```
+Color is an index number from 0-255 that matches XTerm color.
+Only pixels with color are saved; transparent pixels are left out.
+The .spr and .txt file extensions are used by convention but any file
+extension can be used for save files.
+
+Images can be exported to PNG, but sprite is not able to open PNGs,
+so please save images rather than export if you want to work on them
+over multiple sessions. The .png file extension is recommended for
+export; sprite does not add the file extension automatically when
+exporting.
 
 Requirements
 ------------
@@ -21,6 +38,9 @@ Building
 Just run `make`.
 
 Remove `-DHAVE_STRTONUM` if your system needs the strtonum(3) function.
+
+Remove `-DHAVE_GETPROGNAME` if your system needs the getprogname(3)
+function.
 
 License
 -------

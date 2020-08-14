@@ -3,14 +3,14 @@
 CC ?=		cc
 CFLAGS ?=	-O2 -pipe
 CFLAGS +=	-I/usr/local/include
-CFLAGS +=	-DHAVE_STRTONUM
+CFLAGS +=	-DHAVE_GETPROGNAME -DHAVE_STRTONUM
 
 PREFIX ?=	/usr/local
 BINDIR ?=	${PREFIX}/bin
 MANDIR ?=	${PREFIX}/man/man1
 
 PROG =	sprite
-OBJS =	sprite.o strtonum.o
+OBJS =	getprogname.o sprite.o strtonum.o
 
 all: ${OBJS}
 	${CC} ${LDFLAGS} -o ${PROG} ${OBJS} -lcurses -L/usr/local/lib -lpng
