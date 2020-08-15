@@ -9,6 +9,12 @@ flag.
 If your terminal is not large enough to fit the 32x32 canvas, it will
 use the 16x16 canvas instead.
 
+Most terminals do not have 1:1 square character cells.
+This may cause the canvas to have a different aspect ratio than
+expectations.
+PNG export does create standard 1:1 square pixels; exported images
+will look correct.
+
 Save file format
 ----------------
 Images are saved as a flat text file, one pixel per line, in the form
