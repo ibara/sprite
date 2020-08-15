@@ -360,11 +360,11 @@ file_export(int y, int x)
 					row[k++] = 0xff;
 			}
 		}
-		if (extended) {
+
+		if (extended)
 			png_write_row(png_ptr, extended_row);
-		} else {
+		else
 			png_write_row(png_ptr, row);
-		}
 	}
 	png_write_end(png_ptr, NULL);
 
