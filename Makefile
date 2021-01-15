@@ -1,4 +1,6 @@
 # sprite Makefile
+# Written by Brian Callahan <bcallah@openbsd.org>
+# and released into the Public Domain
 
 CC ?=		cc
 CFLAGS ?=	-O2 -pipe

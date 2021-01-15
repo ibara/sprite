@@ -4,10 +4,12 @@ Sprite is an ncurses-based sprite editor.
 You can use it to create and share pixel art.
 
 By default, sprite sets up a 16x16 pixel canvas.
-If you'd like the larger 32x32 pixel canvas, start sprite with the -e
+If you'd like a larger 32x32 pixel canvas, start sprite with the -e
 flag.
-If your terminal is not large enough to fit the 32x32 canvas, it will
-use the 16x16 canvas instead.
+If your terminal is not large enough to fit a 32x32 canvas, it will
+use a 16x16 canvas instead.
+If you'd like a smaller 8x8 pixel canvas, start sprite with the -s
+flag.
 
 Most terminals do not have 1:1 square character cells.
 This may cause the canvas to have a different aspect ratio than

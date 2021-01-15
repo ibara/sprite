@@ -1,7 +1,7 @@
 .\"
 .\" sprite - ncurses-based sprite editor
 .\"
-.\" Copyright (c) 2020 Brian Callahan <bcallah@openbsd.org>
+.\" Copyright (c) 2020-2021 Brian Callahan <bcallah@openbsd.org>
 .\"
 .\" Permission to use, copy, modify, and distribute this software for any
 .\" purpose with or without fee is hereby granted, provided that the above
@@ -15,7 +15,7 @@
 .\" ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 .\" OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 .\"
-.Dd August 11, 2020
+.Dd January 15, 2021
 .Dt SPRITE 1
 .Os
 .Sh NAME
@@ -23,7 +23,7 @@
 .Nd ncurses-based sprite editor
 .Sh SYNOPSIS
 .Nm
-.Op Fl e
+.Op Fl es
 .Op Ar file
 .Sh DESCRIPTION
 .Nm
@@ -35,6 +35,8 @@ The options are as follows:
 .It Fl e
 Use an extended canvas of 32x32 pixels instead of the default 16x16 pixels,
 if the terminal is large enough to support the larger canvas.
+.It Fl s
+Use a smaller canvas of 8x8 pixels instead of the default 16x16 pixels.
 .El
 .Sh AUTHORS
 .Nm
@@ -43,3 +45,5 @@ was written by
 .Sh CAVEATS
 Console aspect ratio may not match user expectations.
 PNG export creates standard square pixels.
+.Pp
+Supports the 256 terminal colors only.
