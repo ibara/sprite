@@ -60,7 +60,7 @@ draw_transparency(void)
 	for (i = 4; i < 20 + (extended ? 16 : (small ? -8 : 0)); i++) {
 		if ((i - 4) % (extended ? 8 : (small ? 2 : 4)) == 0)
 			k = switch_color(k);
-		for (j = 32; j < 48 + (extended ? 16 : (small ? - 8 : 0)); j++) {
+		for (j = 32; j < 48 + (extended ? 16 : (small ? -8 : 0)); j++) {
 			if (j % (extended ? 8: (small ? 2 : 4)) == 0)
 				k = switch_color(k);
 			attron(COLOR_PAIR(k));
