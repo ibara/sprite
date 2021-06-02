@@ -14,10 +14,6 @@
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
-#ifndef HAVE_GETPROGNAME
-extern const char *getprogname(void);
-#endif
-
 #ifndef HAVE_STRTONUM
 extern long long strtonum(const char *, long long, long long, const char **);
 #endif
